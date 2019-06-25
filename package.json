@@ -3,9 +3,6 @@
   "description": "DB layer for RP bot",
   "version": "0.0.0",
   "main": "db.js",
-  "scripts": {
-    "start": "node db.js"
-  },
   "dependencies": {
     "discord.js": "11.5.0",
     "request": "2.81.0",
