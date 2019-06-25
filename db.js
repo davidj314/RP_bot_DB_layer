@@ -16,4 +16,5 @@ module.exports = {
 			else callback(result.rows[0]);
 			}); //end pool.query 
 		pool.end()	
-	},
+	}
+}
