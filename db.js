@@ -16,5 +16,25 @@ module.exports = {
 			else callback(result.rows[0]);
 			}); //end pool.query 
 		pool.end()	
+	},
+	
+	lvl_card: function(server_id, direction, char_id){
+		var update_query = "UPDATE Cards Set "+ direction + "=" +direction + "+1 WHERE server_id=$1 AND char_id=$2";
+		var values = [server_id, char_id];
+		var pool = new PG.Pool({connectionString: process.env.DATABASE_URL,SSL: true});
+		pool.query(update_query, values,  (err, res) => {
+			if (err) console.log(err, res);
+			pool.end();
+		});
+	},
+
+	set_xp: function(server_id, xp, char_id){
+		var update_query = "UPDATE Cards Set xp = $3 WHERE server_id=$1 AND char_id=$2";
+		var values = [server_id, char_id, xp];
+		var pool = new PG.Pool({connectionString: process.env.DATABASE_URL,SSL: true});
+		pool.query(update_query, values,  (err, res) => {
+			if (err) console.log(err, res);
+			pool.end();
+		});
 	}
 }
