@@ -1,5 +1,5 @@
 var PG = require('pg');
-
+var Discord = require('discord.js');
 module.exports = {
 	get_card_info: function(server_id, cid, callback, bad) {
 		var select_query = "SELECT url, xp, upval, downval, leftval, rightval, char_id, name FROM Cards WHERE server_id = $1 AND char_id = $2";
