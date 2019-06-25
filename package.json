@@ -1,0 +1,15 @@
+{
+  "name": "DB_layer",
+  "description": "DB layer for RP bot",
+  "version": "0.0.0",
+  "main": "db.js",
+  "scripts": {
+    "start": "node db.js"
+  },
+  "dependencies": {
+    "discord.js": "11.5.0",
+    "request": "2.81.0",
+    "pg": "7.x",
+  }
+}
+© 2019 GitHub, Inc.
