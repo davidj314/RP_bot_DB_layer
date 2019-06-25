@@ -495,4 +495,4 @@ function decrement_packs(server_id, user_id)
 		}
 		pool.end();
    	});
-},
+}
