@@ -460,20 +460,21 @@ module.exports = {
 	
 	record_name: function(server_id, owner_id, name, callback)
 	{
-	    var insert_query = "INSERT INTO Names (server_id, owner_id, name ) VALUES($1, $2, $3)";
-	    var values = [server_id, owner_id, name];
-	    var pool = new PG.Pool({connectionString: process.env.DATABASE_URL, SSL: true});
-	    var printout =pool.query(insert_query, values,  (err, res) => {
-	    //23505 is unique restriction violation
-	    if (err){
-		if(err.code == '23505'){
-		    var error_string = 'The name "' + name + '" is already in use.'
-		    callback(error_string)
-		}
-	    console.log(err, res);
-	    }
-	  pool.end();
-	});
+		var insert_query = "INSERT INTO Names (server_id, owner_id, name ) VALUES($1, $2, $3)";
+		var values = [server_id, owner_id, name];
+		var pool = new PG.Pool({connectionString: process.env.DATABASE_URL, SSL: true});
+		var printout =pool.query(insert_query, values,  (err, res) => {
+			//23505 is unique restriction violation
+			if (err){
+				if(err.code == '23505'){
+					var error_string = 'The name "' + name + '" is already in use.'
+					callback(error_string)
+				}
+				console.log(err, res);
+			}
+			pool.end();
+		});
+	}
 }
 
 
