@@ -424,23 +424,56 @@ module.exports = {
 	//this function creates a row with given key-value pair to be accessed later.
 	record_lookup: function(server_id, key, value, callback)
 	{
-	    var insert_query = "INSERT INTO Lookup (server_id, infokey, infoval) VALUES($1, $2, $3)";
-	    var values = [server_id, key, value];
-	    var pool = new PG.Pool({connectionString: process.env.DATABASE_URL,SSL: true});
-	    // connection using created pool
-	    pool.query(insert_query, values,  (err, res) => {
-	    //23505
+		var insert_query = "INSERT INTO Lookup (server_id, infokey, infoval) VALUES($1, $2, $3)";
+		var values = [server_id, key, value];
+		var pool = new PG.Pool({connectionString: process.env.DATABASE_URL,SSL: true});
+		// connection using created pool
+		pool.query(insert_query, values,  (err, res) => {
+			if (err){
+				if(err.code == '23505'){
+					var error_string = 'The key ' + key + ' is already in use.'
+					callback(error_string)
+				}
+				console.log(err, res);
+			}
+			pool.end();
+		});
+	},//end function,
+	
+	insert_new_trigger_message: function(server_id, channel_id, message_id, emoji, role, callback)
+	{
+		var insert_query = "INSERT INTO Triggers (server_id, channel_id, message_id, emoji, role_snowflake) VALUES($1, $2, $3, $4, $5)";
+		var values = [server_id, channel_id, message_id, emoji, role];
+		var pool = new PG.Pool({connectionString: process.env.DATABASE_URL,SSL: true});
+		// connection using created pool
+		pool.query(insert_query, values,  (err, res) => {
+			if (err){
+				if(err.code == '23505'){
+					var error_string = 'A role is already assigned to that reaction for that message.'
+					callback(error_string)
+				}
+				console.log(err, res);
+			}
+			pool.end();
+		});
+	},//end function
+	
+	record_name: function(server_id, owner_id, name, callback)
+	{
+	    var insert_query = "INSERT INTO Names (server_id, owner_id, name ) VALUES($1, $2, $3)";
+	    var values = [server_id, owner_id, name];
+	    var pool = new PG.Pool({connectionString: process.env.DATABASE_URL, SSL: true});
+	    var printout =pool.query(insert_query, values,  (err, res) => {
+	    //23505 is unique restriction violation
 	    if (err){
-		if(err.code == '23505')
-		{
-		    var error_string = 'The key ' + key + ' is already in use.'
+		if(err.code == '23505'){
+		    var error_string = 'The name "' + name + '" is already in use.'
 		    callback(error_string)
 		}
 	    console.log(err, res);
 	    }
 	  pool.end();
 	});
-	}//end function
 }
 
 
