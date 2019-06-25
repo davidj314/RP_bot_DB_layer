@@ -474,6 +474,53 @@ module.exports = {
 			}
 			pool.end();
 		});
+	},
+	
+	make_card: function(server_id, owner_id, char_id, url, name, callback) {
+		var insert_query = "INSERT INTO Cards (server_id, owner_id, char_id, upval, downval, leftval, rightval, url, xp, name ) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)"
+		var up = 0;
+		var down = 0;
+		var left = 0;
+		var right = 0;
+		var points = 7;
+		while (points > 0){
+			var side = Math.floor(Math.random() * (4+1 - 1) + 1);
+			if (side == 1) up++;
+			else if (side == 2) down++;
+			else if (side == 3) left++;
+			else right++
+			points--;
+		}
+		var values = [server_id, owner_id, char_id, up, down, left, right, url, 0, name];
+		var newid = -1;
+		var pool = new PG.Pool({connectionString: process.env.DATABASE_URL, SSL: true});
+		var printout =pool.query(insert_query, values,  (err, res) => {
+			//23505 is unique restriction violation
+			if (err){
+				if(err.code == '23505'){
+					var error_string = 'Card already exists for that character'
+					callback(error_string)
+				}
+				console.log(err, res);
+			}
+			else{
+				newid=char_id;
+				if (newid != -1 )add_card_to_inv(server_id, owner_id, newid);
+			}
+		}); //end pool.query
+		pool.end();
+	},
+
+	add_card_to_inv: function(server_id, owner_id, cid) {
+		//id, server_id, owner_id, char_id, UNI (server_id, char_id) char_id is foreign key on names 
+		console.log(`Card to inventory. Player is ${owner_id}, card is ${cid}`);	
+		var insert_query = "INSERT INTO Card_Inv (server_id, owner_id, cid ) VALUES($1, $2, $3)";
+		var values = [server_id, owner_id, cid];
+		var pool = new PG.Pool({connectionString: process.env.DATABASE_URL, SSL: true});
+		var printout =pool.query(insert_query, values,  (err, res) => {
+			if (err) console.log(err, res);
+		}); //end pool.query
+		pool.end();
 	}
 }
 
@@ -529,4 +576,16 @@ function decrement_packs(server_id, user_id)
 		}
 		pool.end();
    	});
+}
+
+function add_card_to_inv(server_id, owner_id, cid) {
+	//id, server_id, owner_id, char_id, UNI (server_id, char_id) char_id is foreign key on names 
+	console.log(`Card to inventory. Player is ${owner_id}, card is ${cid}`);	
+	var insert_query = "INSERT INTO Card_Inv (server_id, owner_id, cid ) VALUES($1, $2, $3)";
+	var values = [server_id, owner_id, cid];
+	var pool = new PG.Pool({connectionString: process.env.DATABASE_URL, SSL: true});
+	var printout =pool.query(insert_query, values,  (err, res) => {
+		if (err) console.log(err, res);
+	}); //end pool.query
+	pool.end();
 }
